@@ -19,7 +19,6 @@ target_include_directories(testObjDetectorServer PRIVATE /usr/include/opencv4)
 target_include_directories(testObjDetectorServer PRIVATE ${CMAKE_SOURCE_DIR}/../common)
 target_include_directories(testObjDetectorServer PRIVATE ${CMAKE_SOURCE_DIR}/../grpc)
 
-
 find_package(OpenCV REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
