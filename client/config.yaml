@@ -1,0 +1,65 @@
+port: 22000
+image: test.jpg
+polygons:
+  - id: p1
+    vertices:
+      - { x: 58, y: 200 }
+      - { x: 124, y: 300 }
+      - { x: 300, y: 500 }
+      - { x: 400, y: 250 }
+      - { x: 100, y: 160 }
+    threshold: 0.21
+    priority: 3
+    type: exclude
+    obj_classes: [0,1,2,5,7,8]
+
+  - id: p2
+    vertices:
+      - { x: 600, y: 140 }
+      - { x: 550, y: 200 }
+      - { x: 700, y: 300 }
+      - { x: 1000, y: 450 }
+      - { x: 850, y: 260 }
+    threshold: 0.3
+    priority: 2
+    type: exclude
+    obj_classes: [0,1,2,4,6]
+
+  - id: p3
+    vertices:
+      - { x: 350, y: 50 }
+      - { x: 300, y: 100 }
+      - { x: 350, y: 200 }
+      - { x: 450, y: 200 }
+      - { x: 550, y: 100 }
+      - { x: 450, y: 50 }
+    threshold: 0.3
+    priority: 1
+    type: include
+    obj_classes: [1,2]
+
+  - id: p4
+    vertices:
+      - { x: 100, y: 20 }
+      - { x: 120, y: 10 }
+      - { x: 140, y: 20 }
+      - { x: 150, y: 40 }
+      - { x: 145, y: 65 }
+      - { x: 125, y: 80 }
+      - { x: 105, y: 70 }
+      - { x: 95,  y: 45 }
+    threshold: 0.54
+    priority: 1
+    type: include
+    obj_classes: [0,1,2]
+
+  - id: p5
+    vertices:
+      - { x: 100, y: 20 }
+      - { x: 120, y: 10 }
+      - { x: 105, y: 70 }
+      - { x: 95,  y: 45 }
+    threshold: 0.54
+    priority: 1
+    type: include
+    obj_classes: [0,1,2]
