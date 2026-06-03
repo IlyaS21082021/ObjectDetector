@@ -31,7 +31,9 @@ and named config.yaml. The config.yaml file specifies the image file and polygon
 parameters. Example data structure:
 
 port: 22000
+
 image: test.jpg
+
 polygons:
   - id: p1
     vertices:
