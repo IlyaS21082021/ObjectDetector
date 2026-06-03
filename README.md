@@ -9,7 +9,7 @@ client: Contains files for building the client-side portion of the application a
 
 common: Contains files used by the client and server portions of the application.
 
-grpc: A folder with files obtained by processing the .proto file to implement the grpc engine.
+grpc: The folder with files obtained by processing the .proto file to implement the grpc engine.
 This folder also contains the file generation script.
 
 server: Contains files for building the server-side portion of the application and a folder with tests.
