@@ -60,55 +60,8 @@ float Polygon::GetMaxX() const { return max_x_; }
 float Polygon::GetMinY() const { return min_y_; }
 float Polygon::GetMaxY() const { return max_y_; }
 
-double Polygon::GetS() const {
-  if (vertices_.size() < 3) return 0;
-  double s = 0.0;
-  size_t n = vertices_.size();
-  for (size_t i = 0; i < n; ++i) {
-    const Point& a = vertices_[i];
-    const Point& b = vertices_[(i + 1) % n];
-    s += static_cast<double>(a.x) * b.y;
-    s -= static_cast<double>(b.x) * a.y;
-  }
-  return std::abs(s) * 0.5;
-}
-
-void Polygon::PushBack(const Point& p) {
-  if (vertices_.empty()) {
-    min_x_ = max_x_ = p.x;
-    min_y_ = max_y_ = p.y;
-  } else {
-    min_x_ = std::min(min_x_, p.x);
-    min_y_ = std::min(min_y_, p.y);
-    max_x_ = std::max(max_x_, p.x);
-    max_y_ = std::max(max_y_, p.y);
-  }
-  vertices_.push_back(p);
-}
-
-Polygon Polygon::CutByEdge(EdgeType edge, const VBox& box) const {
-  Polygon res;
-  if (vertices_.empty()) return res;
-  Point prev_point = vertices_.back();
-  for (const Point& cur_point : vertices_) {
-    bool cur_inside = box.PointInsideCheck(cur_point, edge);
-    bool prev_inside = box.PointInsideCheck(prev_point, edge);
-    if (prev_inside && cur_inside) { //inside -> inside
-      res.PushBack(cur_point);
-    } else if (prev_inside && !cur_inside) { //inside -> outside
-      res.PushBack(box.IntersectionWithLine(prev_point, cur_point, edge));
-    } else if (!prev_inside && cur_inside) { //outside -> inside
-      res.PushBack(box.IntersectionWithLine(prev_point, cur_point, edge));
-      res.PushBack(cur_point);
-    }
-    // outside -> outside: skip
-    prev_point = cur_point;
-  }
-  return res;
-}
-
-Polygon Polygon::GetIntersection(const VBox& box) const {
-  Polygon out = *this;
+Intersection Polygon::GetIntersection(const VBox& box) const {
+  Intersection out(this->GetPoints());
   out = out.CutByEdge(EdgeType::kLeft, box);
   out = out.CutByEdge(EdgeType::kRight, box);
   out = out.CutByEdge(EdgeType::kBottom, box);

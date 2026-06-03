@@ -2,9 +2,9 @@
 #define POLY_H_
 
 #include <set>
-#include <utility>
 #include <vector>
 
+#include "intersection.h"
 #include "point.h"
 #include "vbox.h"
 
@@ -19,6 +19,9 @@ class Polygon {
   PolyType poly_type = PolyType::kInclude;
   std::set<int> obj_classes;
 
+  /**
+   * @brief Default constructor without params
+   */
   Polygon() = default;
 
   /**
@@ -99,26 +102,12 @@ class Polygon {
   float GetMaxY() const;
 
   /**
-   * @brief Function returns area of polygon
-   * 
-   * @return Area of polygon
-   */
-  double GetS() const;
-
-  /**
    * @brief Function returns area of intersection of polygon and box
    * 
    * @param box Box which intersects the polygon
    * @return Area of intersection
    */
   double GetSIntersection(const VBox& box) const;
-
-  /**
-   * @brief Function to add vertex to polygon
-   * 
-   * @param p Point for new vertex
-   */
-  void PushBack(const Point& p);
 
   /**
    * @brief Function to get access to polygon verices
@@ -135,21 +124,12 @@ class Polygon {
   std::vector<Point> vertices_;
 
   /**
-   * @brief Function to cut polygon by edge of a box
-   * 
-   * @param edge Type of box edge which cut the polygon
-   * @param box The box which intersects the polygon
-   * @return New cut polygon
-   */
-  Polygon CutByEdge(EdgeType edge, const VBox& box) const;
-
-  /**
    * @brief Function to obtain the intersection of a polygon and a box
    * 
    * @param box The box which intersects the polygon
    * @return New polygon which is intersaction of the box and the polygon
    */
-  Polygon GetIntersection(const VBox& box) const;
+  Intersection GetIntersection(const VBox& box) const;
 };
 
 #endif  // POLY_H_
