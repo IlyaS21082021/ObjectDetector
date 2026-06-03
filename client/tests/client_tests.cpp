@@ -15,19 +15,8 @@ TEST(CheckInputData, CheckPolygonRead) {
   EXPECT_EQ(polygons.size(), 2);
 
   EXPECT_EQ(polygons[0].GetPoints().size(), 5);
-  EXPECT_NEAR(polygons[0].threshold_, 0.21, 1e-4);
-  EXPECT_EQ(polygons[0].priority_, 3);
-  EXPECT_EQ(polygons[0].poly_type_, PolyType::kExclude);
-  EXPECT_EQ(polygons[0].obj_classes_.size(), 6);
-}
-
-TEST(CheckPolygonProc, CheckPolygonCreation) {
-  Polygon poly;
-  
-}
-
-TEST(CheckPolygonProc, CheckPolygonIntersection) {
-  Polygon poly();
-
-  double s = poly.GetSIntersection()
+  EXPECT_NEAR(polygons[0].threshold, 0.21, 1e-4);
+  EXPECT_EQ(polygons[0].priority, 3);
+  EXPECT_EQ(polygons[0].poly_type, PolyType::kExclude);
+  EXPECT_EQ(polygons[0].obj_classes.size(), 6);
 }
