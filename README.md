@@ -4,6 +4,7 @@ The project consists of four folders:
 - common
 - grpc
 - server.
+  
 client: Contains files for building the client-side portion of the application and a folder with tests.
 common: Contains files used by the client and server portions of the application.
 grpc: A folder with files obtained by processing the .proto file to implement the grpc engine.
