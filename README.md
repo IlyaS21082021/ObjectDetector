@@ -42,11 +42,15 @@ polygons:
       - { x: 300, y: 500 }
       - { x: 400, y: 250 }
       - { x: 100, y: 160 }
+        
     threshold: 0.21
-    priority: 3
-    type: exclude
-    obj_classes: [0,1,2,5,7,8]
 
+    priority: 3
+    
+    type: exclude
+    
+    obj_classes: [0,1,2,5,7,8]
+  
   - id: p2
     vertices:
       - { x: 600, y: 140 }
@@ -54,9 +58,13 @@ polygons:
       - { x: 700, y: 300 }
       - { x: 1000, y: 450 }
       - { x: 850, y: 260 }
+        
     threshold: 0.3
+    
     priority: 2
+    
     type: exclude
+    
     obj_classes: [0,1,2,4,6]
 
 The "polygons" block defines an array of polygons.
