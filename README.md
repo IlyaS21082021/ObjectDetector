@@ -29,6 +29,7 @@ will be built and copied to the server folder.
 The input data is specified in a yaml file. The file should be located next to the client-side executable
 and named config.yaml. The config.yaml file specifies the image file and polygons with
 parameters. Example data structure:
+
 port: 22000
 image: test.jpg
 polygons:
