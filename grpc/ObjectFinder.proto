@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package ObjectFinder;
+
+enum PolygonType
+{
+    INCLUDE = 0;
+    EXCLUDE = 1;
+}
+
+message PolygonData
+{
+    repeated float coords = 1;
+    PolygonType type = 2;
+    float threshold = 3;
+    int32 priority = 4;
+    repeated int32 objclasses = 5;
+}
+
+message ImageRequest
+{
+    bytes image = 1;
+    repeated PolygonData polygons = 2;
+}
+
+message ImageResponse
+{
+    bytes image = 1;
+}
+
+service ObjectFinderServiceGRPC
+{
+    rpc SelectObjects(ImageRequest) returns (ImageResponse);
+}
