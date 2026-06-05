@@ -89,7 +89,6 @@ std::vector<VBox> NNEngine::DelDoubleObjects(
     std::vector<std::vector<VBox>>& data) {
   std::vector<VBox> res;
   const float kDr = 25.0f;
-  const float kDs = 1700.0f;
 
   //cycle over groups
   for (const auto& one_type_objs : data) {
@@ -101,12 +100,11 @@ std::vector<VBox> NNEngine::DelDoubleObjects(
       bool same = false;
       //compare others objects of group with unique in res
       for (size_t j = start_group_idx; j < res.size(); ++j) {
-        float dx = one_type_objs[i].x1 - res[j].x1;
-        float dy = one_type_objs[i].y1 - res[j].y1;
-        float ds = (one_type_objs[i].x2 - one_type_objs[i].x1) *
-                       (one_type_objs[i].y2 - one_type_objs[i].y1) -
-                   (res[j].x2 - res[j].x1) * (res[j].y2 - res[j].y1);
-        if (dx * dx + dy * dy <= kDr && std::abs(ds) <= kDs) {
+        float dx1 = one_type_objs[i].x1 - res[j].x1;
+        float dy1 = one_type_objs[i].y1 - res[j].y1;
+        float dx2 = one_type_objs[i].x2 - res[j].x2;
+        float dy2 = one_type_objs[i].y2 - res[j].y2;
+        if (dx1 * dx1 + dy1 * dy1 <= kDr && dx2 * dx2 + dy2 * dy2 <= kDr) {
           same = true;
           break;
         }
