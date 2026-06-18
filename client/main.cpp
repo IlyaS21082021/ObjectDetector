@@ -35,7 +35,8 @@ int main() {
   }
 
   const std::string& img_data = response.image();
-  std::vector<uchar> result_bytes(img_data.begin(), img_data.end());
+  cv::Mat result_bytes(1, img_data.size(), CV_8UC1, 
+                       const_cast<char*>(img_data.data()));
   cv::Mat result_image = cv::imdecode(result_bytes, cv::IMREAD_COLOR);
   if (result_image.empty()) {
     std::cerr << "Cannot decode response image\n";
