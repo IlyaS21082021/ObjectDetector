@@ -1,7 +1,7 @@
 #include "utils.h"
 
 std::vector<VBox> BoxFilter(const std::vector<VBox>& boxes,
-                           const std::vector<Polygon>& polygons) {
+                            const std::vector<Polygon>& polygons) {
   std::vector<VBox> res;
   for (const auto& b : boxes) {
     int high_priority_idx = -1;
