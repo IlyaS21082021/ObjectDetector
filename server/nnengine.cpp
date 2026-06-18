@@ -88,7 +88,7 @@ const float* NNEngine::GetObjTypeValuesP(int obj_type) {
 std::vector<VBox> NNEngine::DelDoubleObjects(
     std::vector<std::vector<VBox>>& data) {
   std::vector<VBox> res;
-  const float kDr = 25.0f;
+  const float kDif = 5.0f;
 
   //cycle over groups
   for (const auto& one_type_objs : data) {
@@ -100,11 +100,13 @@ std::vector<VBox> NNEngine::DelDoubleObjects(
       bool same = false;
       //compare others objects of group with unique in res
       for (size_t j = start_group_idx; j < res.size(); ++j) {
-        float dx1 = one_type_objs[i].x1 - res[j].x1;
-        float dy1 = one_type_objs[i].y1 - res[j].y1;
-        float dx2 = one_type_objs[i].x2 - res[j].x2;
-        float dy2 = one_type_objs[i].y2 - res[j].y2;
-        if (dx1 * dx1 + dy1 * dy1 <= kDr && dx2 * dx2 + dy2 * dy2 <= kDr) {
+        float dx1 = std::abs(one_type_objs[i].x1 - res[j].x1);
+        float dy1 = std::abs(one_type_objs[i].y1 - res[j].y1);
+        float dx2 = std::abs(one_type_objs[i].x2 - res[j].x2);
+        float dy2 = std::abs(one_type_objs[i].y2 - res[j].y2);
+
+        if (dx1 <= kDif && dy1 <= kDif && dx2 <= kDif && 
+            dy2 <= kDif) {
           same = true;
           break;
         }
