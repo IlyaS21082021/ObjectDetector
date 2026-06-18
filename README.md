@@ -1,3 +1,6 @@
+## About project  
+Application detects objects in a given image within designated regions. The areas are marked by polygons. The detection is carried out only for classes of objects defined for every polygon in config file. Detected objects are enclosed in bounding boxes. The application is based on opencv library and uses YOLO ONNX models. It is devided into server and client parts communicating via grpc.
+
 ## 1. Project Structure  
 The project consists of four folders:  
 - client 
