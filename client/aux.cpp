@@ -33,8 +33,8 @@ std::vector<Polygon> LoadPolygons(const YAML::Node& config) {
     CheckInputData(node);
     std::vector<float> poly_vertices;
     for (const auto& vertex : node["vertices"]) {
-      poly_vertices.push_back(vertex["x"].as<int>());
-      poly_vertices.push_back(vertex["y"].as<int>());
+      poly_vertices.push_back(vertex["x"].as<float>());
+      poly_vertices.push_back(vertex["y"].as<float>());
     }
     if (poly_vertices.size() < 8) {
       throw std::runtime_error("Wrong number of vertices (should be > 3)");
@@ -45,10 +45,10 @@ std::vector<Polygon> LoadPolygons(const YAML::Node& config) {
       obj_classes.insert(cl.as<int>());
     }
 
-    PolyType poly_type_ = (node["type"].as<std::string>() == "include")
+    PolyType poly_type = (node["type"].as<std::string>() == "include")
                               ? PolyType::kInclude
                               : PolyType::kExclude;
-    res.emplace_back(poly_vertices, obj_classes, poly_type_, node["threshold"].as<float>(),
+    res.emplace_back(poly_vertices, obj_classes, poly_type, node["threshold"].as<float>(),
                      node["priority"].as<int>());
   }
   return res;
