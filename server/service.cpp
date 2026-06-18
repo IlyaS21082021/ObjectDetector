@@ -14,8 +14,9 @@ grpc::Status ObjectFinderService::SelectObjects(
     const ObjectFinder::ImageRequest* request,
     ObjectFinder::ImageResponse* response) {
   const std::string& img_data = request->image();
-  cv::Mat image = cv::imdecode(
-      std::vector<uchar>(img_data.begin(), img_data.end()), cv::IMREAD_COLOR);
+  cv::Mat received_bytes(1, img_data.size(), CV_8UC1, 
+                         const_cast<char*>(img_data.data()));
+  cv::Mat image = cv::imdecode(received_bytes, cv::IMREAD_COLOR);
   if (image.empty()) {
     return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Invalid image");
   }
