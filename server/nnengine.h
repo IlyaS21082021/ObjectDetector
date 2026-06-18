@@ -18,7 +18,7 @@
 class NNEngine {
  public:
  /**
-  * @brief  Consturctor of the class
+  * @brief  Constructor of the class
   * 
   * @param model_path Path to the model file
   * @param width Width of the images the model should process
