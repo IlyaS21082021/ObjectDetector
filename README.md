@@ -16,10 +16,10 @@ This folder also contains the file generation script.
 
 ## 2. Build
 The client and server portions of the application are built separately, each in its own folder.  
-### 2.1. Build the client portion.
+### 2.1. Build the client part.
 In the client folder, create a "build" folder. From there, run the CMakeLists.txt file located in the upper level, then "make." The application
 will be built and copied to the client folder.  
-### 2.2. Build the server portion.
+### 2.2. Build the server part.
 In the server folder, create a "build" folder. From there, run the CMakeLists.txt file located in the upper level, then "make". The application
 will be built and copied to the server folder.  
 ## 3. Input Data
