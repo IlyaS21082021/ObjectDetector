@@ -52,6 +52,7 @@ polygons:
     obj_classes: [0,1,2,4,6]
 ```
 
+- **image** - path to image that should be processed.
 - **polygons** block defines an array of polygons.  
 - **vertices** block defines an array of vertices with coordinates. There must be at least 4 vertices.  
 - **threshold** specifies the minimum ratio of the intersection area of ​​a given polygon with the object's box in the image to the area of ​​that box for displaying the object's box.  
