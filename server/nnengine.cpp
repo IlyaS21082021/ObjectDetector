@@ -152,6 +152,6 @@ EngineContextThread NNEngine::SetContextForThread(const cv::Mat& img) const {
   EngineContextThread ctx;
   ctx.sx = static_cast<float>(img.cols) / input_width_;
   ctx.sy = static_cast<float>(img.rows) / input_height_;
-  ctx.input_tensor_values.resize(input_width_ * input_height_ * 3); //todo: optimize
+  ctx.input_tensor_values.resize(input_width_ * input_height_ * 3); //todo: optimize - cyclic memory buffer with atomic index
   return ctx;
 }
