@@ -12,6 +12,15 @@
 
 #include "vbox.h"
 
+struct EngineContextThread {
+  float sx;
+  float sy;
+  size_t objects_count;
+  std::vector<VBox> res_boxes; 
+  std::vector<float> input_tensor_values;
+  std::vector<Ort::Value> output_tensors; 
+};
+
 /**
  * @brief Class to work with onnx model
  */
@@ -32,7 +41,7 @@ class NNEngine {
    * @param image Data of the loaded image
    * @return True if image processed whithout errors
    */
-  bool ProcessImage(const cv::Mat& image);
+  bool ProcessImage(const cv::Mat& image, EngineContextThread& ctx);
 
   /**
    * @brief Function to get access to x coordinates of the center
@@ -40,7 +49,7 @@ class NNEngine {
    * 
    * @return pointer to the x coordinates
    */
-  const float* GetXP();
+  const float* GetXP(const EngineContextThread& ctx) const;
 
   /**
    * @brief Function to get access to y coordinates of the center
@@ -48,7 +57,7 @@ class NNEngine {
    * 
    * @return pointer to the y coordinates
    */
-  const float* GetYP();
+  const float* GetYP(const EngineContextThread& ctx) const;
 
   /**
    * @brief Function to get access to width 
@@ -56,7 +65,7 @@ class NNEngine {
    * 
    * @return pointer to the width coordinates
    */
-  const float* GetWidthP();
+  const float* GetWidthP(const EngineContextThread& ctx) const;
 
   /**
    * @brief Function to get access to height
@@ -64,7 +73,7 @@ class NNEngine {
    * 
    * @return pointer to the height coordinates
    */
-  const float* GetHeightP();
+  const float* GetHeightP(const EngineContextThread& ctx) const;
 
   /**
    * @brief Function to get access to values corresponding the probability
@@ -72,7 +81,8 @@ class NNEngine {
    * 
    * @return pointer to the values
    */
-  const float* GetObjTypeValuesP(int obj_type);
+  const float* GetObjTypeValuesP(int obj_type, 
+                                 const EngineContextThread& ctx) const;
 
   /**
    * @brief Function to obtain boxes of certain classes of objects
@@ -85,8 +95,11 @@ class NNEngine {
    * @return Vector of the boxes corresponding to the classes of the objects
    *         in obj_types set
    */
-  const std::vector<VBox>& GetBoxes(const std::set<int>& obj_types,
-                                    float min_obj_type_score);
+  const std::vector<VBox> GetBoxes(const std::set<int>& obj_types,
+                                    float min_obj_type_score,
+                                    EngineContextThread& ctx) const;
+
+  EngineContextThread SetContextForThread(const cv::Mat& img) const;
 
  private:
   int input_width_;
@@ -101,15 +114,7 @@ class NNEngine {
   std::array<int64_t, 4> input_shape_;
   Ort::MemoryInfo memory_info_;
 
-  std::vector<float> input_tensor_values_;
   size_t channel_size_;
-
-  std::vector<Ort::Value> output_tensors_;
-  float sx_;
-  float sy_;
-  size_t objects_count_;
-
-  std::vector<VBox> res_boxes_;
 
   /**
    * @brief Function deletes doublicates of the box for the same object

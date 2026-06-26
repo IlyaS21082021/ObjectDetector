@@ -21,7 +21,8 @@ grpc::Status ObjectFinderService::SelectObjects(
     return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Invalid image");
   }
 
-  if (!nn_engine_.ProcessImage(image)) {
+  auto ctx = nn_engine_.SetContextForThread(image);
+  if (!nn_engine_.ProcessImage(image, ctx)) {
     return grpc::Status(grpc::StatusCode::INTERNAL, "Failed to process image");
   }
 
@@ -41,7 +42,7 @@ grpc::Status ObjectFinderService::SelectObjects(
     }
   }
   //del double boxes
-  auto unique_boxes = nn_engine_.GetBoxes(g_obj_classes, 0.55f);  
+  auto unique_boxes = nn_engine_.GetBoxes(g_obj_classes, 0.55f, ctx);  
   //obtain only needed boxes
   auto filtered_boxes = BoxFilter(unique_boxes, polygons);
   for (const auto& b : filtered_boxes) {

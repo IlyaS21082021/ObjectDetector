@@ -18,22 +18,18 @@ NNEngine::NNEngine(const std::string& model_path, int width, int height)
   output_name_str_ = session_->GetOutputNameAllocated(0, allocator).get();
 
   input_shape_ = {1, 3, input_width_, input_height_};
-  input_tensor_values_.resize(input_width_ * input_height_ * 3);
   channel_size_ = input_width_ * input_height_;
 }
 
-bool NNEngine::ProcessImage(const cv::Mat& image) {
+bool NNEngine::ProcessImage(const cv::Mat& image, EngineContextThread& ctx) {
   if (image.empty()) {
     std::cerr << "Cannot load image\n";
     return false;
   }
-  res_boxes_.clear();
 
   //calc scale coeffs
   cv::Mat resized;
-  cv::resize(image, resized, cv::Size(input_width_, input_height_));
-  sx_ = static_cast<float>(image.cols) / input_width_;
-  sy_ = static_cast<float>(image.rows) / input_height_;
+  cv::resize(image, resized, cv::Size(input_width_, input_height_));  
 
   cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
   resized.convertTo(resized, CV_32F, 1.0 / 255.0);
@@ -42,9 +38,9 @@ bool NNEngine::ProcessImage(const cv::Mat& image) {
   for (int y = 0; y < input_height_; ++y) {
     for (int x = 0; x < input_width_; ++x) {
       cv::Vec3f pixel = resized.at<cv::Vec3f>(y, x);
-      input_tensor_values_[0 * channel_size_ + y * input_width_ + x] = pixel[0];
-      input_tensor_values_[1 * channel_size_ + y * input_width_ + x] = pixel[1];
-      input_tensor_values_[2 * channel_size_ + y * input_width_ + x] = pixel[2];
+      ctx.input_tensor_values[0 * channel_size_ + y * input_width_ + x] = pixel[0];
+      ctx.input_tensor_values[1 * channel_size_ + y * input_width_ + x] = pixel[1];
+      ctx.input_tensor_values[2 * channel_size_ + y * input_width_ + x] = pixel[2];
     }
   }
 
@@ -52,37 +48,38 @@ bool NNEngine::ProcessImage(const cv::Mat& image) {
   const char* output_names[] = {output_name_str_.c_str()};
 
   Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
-      memory_info_, input_tensor_values_.data(), input_tensor_values_.size(),
+      memory_info_, ctx.input_tensor_values.data(), ctx.input_tensor_values.size(),
       input_shape_.data(), input_shape_.size());
 
   //run object detection
-  output_tensors_ = session_->Run(Ort::RunOptions{nullptr}, input_names,
+  ctx.output_tensors = session_->Run(Ort::RunOptions{nullptr}, input_names,
                                   &input_tensor, 1, output_names, 1);
 
-  auto type_info = output_tensors_[0].GetTensorTypeAndShapeInfo();
-  objects_count_ = type_info.GetShape()[2];
+  auto type_info = ctx.output_tensors[0].GetTensorTypeAndShapeInfo();
+  ctx.objects_count = type_info.GetShape()[2];
   return true;
 }
 
-const float* NNEngine::GetXP() {
-  return output_tensors_[0].GetTensorData<float>();
+const float* NNEngine::GetXP(const EngineContextThread& ctx) const {
+  return ctx.output_tensors[0].GetTensorData<float>();
 }
 
-const float* NNEngine::GetYP() {
-  return output_tensors_[0].GetTensorData<float>() + objects_count_;
+const float* NNEngine::GetYP(const EngineContextThread& ctx) const {
+  return ctx.output_tensors[0].GetTensorData<float>() + ctx.objects_count;
 }
 
-const float* NNEngine::GetWidthP() {
-  return output_tensors_[0].GetTensorData<float>() + objects_count_ * 2;
+const float* NNEngine::GetWidthP(const EngineContextThread& ctx) const {
+  return ctx.output_tensors[0].GetTensorData<float>() + ctx.objects_count * 2;
 }
 
-const float* NNEngine::GetHeightP() {
-  return output_tensors_[0].GetTensorData<float>() + objects_count_ * 3;
+const float* NNEngine::GetHeightP(const EngineContextThread& ctx) const {
+  return ctx.output_tensors[0].GetTensorData<float>() + ctx.objects_count * 3;
 }
 
-const float* NNEngine::GetObjTypeValuesP(int obj_type) {
-  return output_tensors_[0].GetTensorData<float>() +
-         objects_count_ * (obj_type + 4);
+const float* NNEngine::GetObjTypeValuesP(int obj_type, 
+                                        const EngineContextThread& ctx) const {
+  return ctx.output_tensors[0].GetTensorData<float>() +
+         ctx.objects_count * (obj_type + 4);
 }
 
 std::vector<VBox> NNEngine::DelDoubleObjects(
@@ -117,21 +114,22 @@ std::vector<VBox> NNEngine::DelDoubleObjects(
   return res;
 }
 
-const std::vector<VBox>& NNEngine::GetBoxes(const std::set<int>& obj_types,
-                                             float min_obj_type_score) {
-  if (!res_boxes_.empty()) return res_boxes_;
+const std::vector<VBox> NNEngine::GetBoxes(const std::set<int>& obj_types,
+                                             float min_obj_type_score,
+                                             EngineContextThread& ctx) const {
+  if (!ctx.res_boxes.empty()) return ctx.res_boxes;
 
-  const float* px = GetXP();
-  const float* py = GetYP();
-  const float* pw = GetWidthP();
-  const float* ph = GetHeightP();
+  const float* px = GetXP(ctx);
+  const float* py = GetYP(ctx);
+  const float* pw = GetWidthP(ctx);
+  const float* ph = GetHeightP(ctx);
 
   std::vector<std::vector<VBox>> output_boxes;
   for (int obj_type : obj_types) {
     //get class probability of the object
-    const float* pc = GetObjTypeValuesP(obj_type);
+    const float* pc = GetObjTypeValuesP(obj_type, ctx);
     bool vector_added = false;
-    for (size_t i = 0; i < objects_count_; ++i) {
+    for (size_t i = 0; i < ctx.objects_count; ++i) {
       if (pc[i] > min_obj_type_score) {
         if (!vector_added) {
           output_boxes.emplace_back(); //create new group
@@ -144,7 +142,16 @@ const std::vector<VBox>& NNEngine::GetBoxes(const std::set<int>& obj_types,
   }
 
   //output_boxes - objects sorted by group
-  res_boxes_ = DelDoubleObjects(output_boxes);
-  for (auto& b : res_boxes_) b.ScaleData(sx_, sy_);
-  return res_boxes_;
+  ctx.res_boxes = DelDoubleObjects(output_boxes);
+  for (auto& b : ctx.res_boxes) b.ScaleData(ctx.sx, ctx.sy);
+  return ctx.res_boxes;
+}
+
+
+EngineContextThread NNEngine::SetContextForThread(const cv::Mat& img) const {
+  EngineContextThread ctx;
+  ctx.sx = static_cast<float>(img.cols) / input_width_;
+  ctx.sy = static_cast<float>(img.rows) / input_height_;
+  ctx.input_tensor_values.resize(input_width_ * input_height_ * 3); //todo: optimize
+  return ctx;
 }
